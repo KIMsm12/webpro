@@ -28,4 +28,3 @@
 - 사용자가 웹 브라우저(클라이언트)를 통해 웹사이트 접속 요청 →  
 - 해당 요청을 처리하고 HTML, CSS, JS 파일을 제공하는 곳이 **웹 서버**
 
-https://kimsm12.github.io/webpro/0903/index.html
