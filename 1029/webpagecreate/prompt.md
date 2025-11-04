@@ -47,3 +47,5 @@
 - 카테고리 별 질문 받기 추가
 - STAR 가이드 추가
 - 인터페이스 조정
+
+https://daily-interview.lovable.app
