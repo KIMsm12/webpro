@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜덤 면접 질문 생성기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 헤더 */
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+        }
+
+        /* 메인 레이아웃 - 좌우 분할 */
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            padding: 0 20px 40px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* 사이드바 (왼쪽) */
+        .sidebar {
+            flex: 0 0 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .sidebar-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        /* 메인 컨텐츠 (오른쪽) */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            min-width: 0;
+        }
+
+        /* 카테고리 필터 */
+        .category-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 18px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 타이머 */
+        .timer-display {
+            font-size: 2.2em;
+            color: #667eea;
+            font-weight: 700;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .timer-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .timer-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timer-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .timer-btn.secondary {
+            background: #f0f2ff;
+            color: #667eea;
+        }
+
+        .timer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* STAR 템플릿 */
+        .star-item {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+            font-size: 0.85em;
+        }
+
+        .star-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+        }
+
+        .star-item span {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* 히스토리 */
+        .history-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+            font-size: 0.85em;
+        }
+
+        .history-question {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .history-answer {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .history-time {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .clear-history {
+            margin-top: 12px;
+            width: 100%;
+            padding: 10px;
+            background: #ffebee;
+            color: #c62828;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .clear-history:hover {
+            background: #ffcdd2;
+        }
+
+        /* 질문 카드 */
+        .question-card {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeInScale 0.5s ease-out;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.6em;
+            line-height: 1.7;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .question-category {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #f0f2ff;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        /* 버튼 그룹 */
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 답변 영역 */
+        .answer-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .answer-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.05em;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .char-count {
+            text-align: right;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+
+        .char-feedback {
+            margin-top: 15px;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            display: none;
+        }
+
+        .feedback-low {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .feedback-medium {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .feedback-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 토스트 알림 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideInRight 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        /* 반응형 - 태블릿 */
+        @media (max-width: 1200px) {
+            .sidebar {
+                flex: 0 0 320px;
+            }
+
+            .sidebar-section {
+                padding: 20px;
+            }
+
+            .question-card {
+                padding: 35px;
+            }
+
+            .answer-section {
+                padding: 30px;
+            }
+        }
+
+        /* 반응형 - 모바일 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .main-layout {
+                flex-direction: column;
+                padding: 0 15px 30px;
+            }
+
+            .sidebar {
+                flex: none;
+                width: 100%;
+            }
+
+            .question-card {
+                padding: 25px;
+            }
+
+            .question-text {
+                font-size: 1.3em;
+            }
+
+            .answer-section {
+                padding: 25px;
+            }
+
+            textarea {
+                min-height: 150px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .timer-display {
+                font-size: 1.8em;
+            }
+        }
+
+        /* 스크롤바 스타일 */
+        .history-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .history-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .history-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header>
+        <h1>🎯 랜덤 면접 질문 생성기</h1>
+        <p class="subtitle">면접 준비를 위한 스마트한 도구</p>
+    </header>
+
+    <!-- 메인 레이아웃 -->
+    <div class="main-layout">
+        <!-- 사이드바 -->
+        <aside class="sidebar">
+            <!-- 카테고리 필터 -->
+            <div class="sidebar-section">
+                <h3>📂 질문 카테고리</h3>
+                <div class="category-buttons">
+                    <button class="category-btn active" data-category="all">전체</button>
+                    <button class="category-btn" data-category="personality">인성</button>
+                    <button class="category-btn" data-category="technical">기술</button>
+                    <button class="category-btn" data-category="situational">상황</button>
+                </div>
+            </div>
+
+            <!-- 타이머 -->
+            <div class="sidebar-section">
+                <h3>⏱️ 답변 타이머</h3>
+                <div class="timer-display" id="timerDisplay">00:00</div>
+                <div class="timer-controls">
+                    <button class="timer-btn primary" id="startTimer">⏯️ 시작</button>
+                    <button class="timer-btn secondary" id="pauseTimer">⏸️ 일시정지</button>
+                    <button class="timer-btn secondary" id="resetTimer">🔄 초기화</button>
+                </div>
+            </div>
+
+            <!-- STAR 템플릿 -->
+            <div class="sidebar-section">
+                <h3>⭐ STAR 템플릿</h3>
+                <div class="star-item">
+                    <strong>S - Situation</strong>
+                    <span>어떤 상황이었나요?</span>
+                </div>
+                <div class="star-item">
+                    <strong>T - Task</strong>
+                    <span>무엇을 해야 했나요?</span>
+                </div>
+                <div class="star-item">
+                    <strong>A - Action</strong>
+                    <span>어떤 행동을 취했나요?</span>
+                </div>
+                <div class="star-item">
+                    <strong>R - Result</strong>
+                    <span>어떤 결과를 얻었나요?</span>
+                </div>
+            </div>
+
+            <!-- 답변 히스토리 -->
+            <div class="sidebar-section">
+                <h3>📚 답변 히스토리</h3>
+                <div class="history-content" id="historyList">
+                    <p style="text-align: center; color: #999; font-size: 0.9em;">저장된 답변이 없습니다</p>
+                </div>
+                <button class="clear-history" id="clearHistory" style="display: none;">
+                    전체 삭제
+                </button>
+            </div>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+            <!-- 질문 카드 -->
+            <div class="question-card" id="questionCard">
+                <div class="question-number" id="questionNumber">질문 #1</div>
+                <div class="question-text" id="questionText">버튼을 눌러 면접 질문을 시작하세요!</div>
+                <span class="question-category" id="questionCategory">시작하기</span>
+            </div>
+
+            <!-- 버튼 그룹 -->
+            <div class="button-group">
+                <button class="btn-primary" id="nextQuestion">📝 다음 질문</button>
+                <button class="btn-secondary" id="copyQuestion">📋 질문 복사하기</button>
+            </div>
+
+            <!-- 답변 작성 영역 -->
+            <div class="answer-section">
+                <h3>✍️ 나의 답변 작성</h3>
+                <textarea id="answerText" placeholder="여기에 답변을 작성해보세요...&#10;&#10;💡 Tip: STAR 템플릿을 활용해보세요!"></textarea>
+                <div class="char-count" id="charCount">0자</div>
+                <div class="char-feedback" id="charFeedback"></div>
+                <button class="btn-primary" id="saveAnswer" style="margin-top: 15px; width: 100%;">
+                    💾 답변 저장하기
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 면접 질문 데이터 (60개 이상)
+        const interviewQuestions = [
+            // 인성 면접
+            { text: "자기소개를 해주세요.", category: "personality" },
+            { text: "우리 회사에 지원한 이유는 무엇인가요?", category: "personality" },
+            { text: "본인의 장점과 단점은 무엇인가요?", category: "personality" },
+            { text: "5년 후 자신의 모습은 어떨 것 같나요?", category: "personality" },
+            { text: "존경하는 인물이 있나요? 그 이유는?", category: "personality" },
+            { text: "최근에 읽은 책이나 감명 깊었던 책이 있나요?", category: "personality" },
+            { text: "스트레스는 어떻게 해소하나요?", category: "personality" },
+            { text: "팀 프로젝트에서 갈등이 생겼을 때 어떻게 해결하나요?", category: "personality" },
+            { text: "실패했던 경험과 그로부터 배운 점은?", category: "personality" },
+            { text: "리더십을 발휘했던 경험이 있나요?", category: "personality" },
+            { text: "본인이 생각하는 성공의 기준은 무엇인가요?", category: "personality" },
+            { text: "협업 시 가장 중요하게 생각하는 가치는?", category: "personality" },
+            { text: "야근이나 주말 근무가 필요하다면 가능한가요?", category: "personality" },
+            { text: "다른 회사에도 지원했나요? 합격하면 어디로 갈 건가요?", category: "personality" },
+            { text: "본인의 핵심 가치관은 무엇인가요?", category: "personality" },
+            { text: "동료들과 의견 충돌이 있을 때 어떻게 대처하나요?", category: "personality" },
+            { text: "본인만의 특별한 강점이 있다면?", category: "personality" },
+            { text: "회사에서 가장 중요하게 생각하는 것은 무엇인가요?", category: "personality" },
+            { text: "일과 삶의 균형을 어떻게 유지하나요?", category: "personality" },
+            { text: "본인의 커리어 목표는 무엇인가요?", category: "personality" },
+            { text: "다양성과 포용성에 대한 본인의 생각은?", category: "personality" },
+            { text: "원격 근무에 대한 경험이나 생각은?", category: "personality" },
+            { text: "지속적인 학습을 위해 어떤 노력을 하나요?", category: "personality" },
+
+            // 기술 면접
+            { text: "본인의 기술 스택을 소개해주세요.", category: "technical" },
+            { text: "최근에 진행한 프로젝트에 대해 설명해주세요.", category: "technical" },
+            { text: "가장 자신 있는 프로그래밍 언어는 무엇이고, 그 이유는?", category: "technical" },
+            { text: "객체지향 프로그래밍(OOP)에 대해 설명해주세요.", category: "technical" },
+            { text: "데이터베이스 정규화에 대해 설명해주세요.", category: "technical" },
+            { text: "RESTful API란 무엇인가요?", category: "technical" },
+            { text: "Git을 사용한 경험이 있나요? 브랜치 전략은?", category: "technical" },
+            { text: "프로젝트에서 어려웠던 기술적 문제와 해결 방법은?", category: "technical" },
+            { text: "최신 기술 트렌드 중 관심 있는 것은?", category: "technical" },
+            { text: "코드 리뷰 경험이 있나요? 어떻게 진행했나요?", category: "technical" },
+            { text: "테스트 코드 작성 경험이 있나요?", category: "technical" },
+            { text: "알고리즘 문제 해결 능력을 평가할 수 있는 경험은?", category: "technical" },
+            { text: "프론트엔드와 백엔드의 차이점은 무엇인가요?", category: "technical" },
+            { text: "본인이 작성한 코드 중 가장 자랑스러운 것은?", category: "technical" },
+            { text: "SQL과 NoSQL의 차이점을 설명해주세요.", category: "technical" },
+            { text: "웹 성능 최적화 방법에는 어떤 것들이 있나요?", category: "technical" },
+            { text: "클라우드 서비스 사용 경험이 있나요?", category: "technical" },
+            { text: "프레임워크와 라이브러리의 차이는?", category: "technical" },
+            { text: "보안 취약점에 대해 알고 있는 것이 있나요?", category: "technical" },
+            { text: "동기와 비동기의 차이를 설명해주세요.", category: "technical" },
+            { text: "애자일 방법론에 대해 설명해주세요.", category: "technical" },
+            { text: "마이크로서비스 아키텍처란 무엇인가요?", category: "technical" },
+            { text: "CI/CD에 대해 설명해주세요.", category: "technical" },
+            { text: "컨테이너와 가상머신의 차이는?", category: "technical" },
+            { text: "반응형 웹 디자인을 구현한 경험이 있나요?", category: "technical" },
+
+            // 상황 면접
+            { text: "프로젝트 마감 기한이 촉박한데 예상치 못한 버그가 발생했습니다. 어떻게 대응하시겠습니까?", category: "situational" },
+            { text: "팀원이 업무를 제대로 수행하지 않아 프로젝트에 차질이 생겼습니다. 어떻게 하시겠습니까?", category: "situational" },
+            { text: "상사의 지시가 비효율적이라고 생각될 때 어떻게 하시겠습니까?", category: "situational" },
+            { text: "고객이 불합리한 요구를 할 때 어떻게 대응하시겠습니까?", category: "situational" },
+            { text: "여러 업무가 동시에 주어졌을 때 우선순위를 어떻게 정하나요?", category: "situational" },
+            { text: "새로운 기술을 빠르게 학습해야 하는 상황이라면?", category: "situational" },
+            { text: "의견 충돌로 회의가 길어질 때 어떻게 해결하시겠습니까?", category: "situational" },
+            { text: "실수로 중요한 데이터를 삭제했다면 어떻게 대처하시겠습니까?", category: "situational" },
+            { text: "프로젝트 도중 요구사항이 크게 변경되었습니다. 어떻게 하시겠습니까?", category: "situational" },
+            { text: "동료가 도움을 요청했지만 본인도 바쁜 상황이라면?", category: "situational" },
+            { text: "회사의 방침에 동의하지 않을 때는 어떻게 하나요?", category: "situational" },
+            { text: "번아웃이 올 것 같은 상황에서 어떻게 대처하나요?", category: "situational" },
+            { text: "팀의 분위기가 좋지 않을 때 어떻게 개선하시겠습니까?", category: "situational" },
+            { text: "예산이 부족한 상황에서 프로젝트를 진행해야 한다면?", category: "situational" },
+            { text: "기술 부채가 쌓인 레거시 코드를 맡게 되었다면?", category: "situational" },
+            { text: "리더의 결정이 잘못되었다고 생각될 때는?", category: "situational" },
+            { text: "고객의 피드백이 부정적일 때 어떻게 대응하나요?", category: "situational" },
+            { text: "자원이 제한된 상황에서 프로젝트를 완수해야 한다면?", category: "situational" },
+            { text: "팀 내에서 혁신적인 아이디어를 제안하고 싶다면?", category: "situational" }
+        ];
+
+        // 전역 변수
+        let currentQuestionIndex = 0;
+        let questionCount = 0;
+        let selectedCategory = 'all';
+        let filteredQuestions = [...interviewQuestions];
+        let answerHistory = JSON.parse(localStorage.getItem('answerHistory') || '[]');
+        
+        // 타이머 변수
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isTimerRunning = false;
+
+        // DOM 요소
+        const questionCard = document.getElementById('questionCard');
+        const questionNumber = document.getElementById('questionNumber');
+        const questionText = document.getElementById('questionText');
+        const questionCategory = document.getElementById('questionCategory');
+        const nextQuestionBtn = document.getElementById('nextQuestion');
+        const copyQuestionBtn = document.getElementById('copyQuestion');
+        const answerTextarea = document.getElementById('answerText');
+        const charCount = document.getElementById('charCount');
+        const charFeedback = document.getElementById('charFeedback');
+        const saveAnswerBtn = document.getElementById('saveAnswer');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startTimerBtn = document.getElementById('startTimer');
+        const pauseTimerBtn = document.getElementById('pauseTimer');
+        const resetTimerBtn = document.getElementById('resetTimer');
+
+        // 카테고리 이름 매핑
+        const categoryNames = {
+            'personality': '인성',
+            'technical': '기술',
+            'situational': '상황'
+        };
+
+        // 초기화
+        function init() {
+            updateHistoryDisplay();
+            shuffleQuestions();
+        }
+
+        // 질문 섞기
+        function shuffleQuestions() {
+            filteredQuestions = selectedCategory === 'all' 
+                ? [...interviewQuestions]
+                : interviewQuestions.filter(q => q.category === selectedCategory);
+            
+            // Fisher-Yates 셔플
+            for (let i = filteredQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredQuestions[i], filteredQuestions[j]] = [filteredQuestions[j], filteredQuestions[i]];
+            }
+            
+            currentQuestionIndex = 0;
+        }
+
+        // 다음 질문 표시
+        function showNextQuestion() {
+            if (currentQuestionIndex >= filteredQuestions.length) {
+                currentQuestionIndex = 0;
+                shuffleQuestions();
+            }
+
+            const question = filteredQuestions[currentQuestionIndex];
+            questionCount++;
+            
+            questionNumber.textContent = `질문 #${questionCount}`;
+            questionText.textContent = question.text;
+            questionCategory.textContent = categoryNames[question.category];
+            
+            // 카드 애니메이션
+            questionCard.style.animation = 'none';
+            setTimeout(() => {
+                questionCard.style.animation = 'fadeInScale 0.5s ease-out';
+            }, 10);
+
+            currentQuestionIndex++;
+            answerTextarea.value = '';
+            charCount.textContent = '0자';
+            charFeedback.style.display = 'none';
+        }
+
+        // 질문 복사
+        function copyQuestion() {
+            const text = questionText.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 질문이 복사되었습니다!');
+            }).catch(() => {
+                showToast('❌ 복사에 실패했습니다.');
+            });
+        }
+
+        // 글자 수 업데이트 (실시간 피드백 없이)
+        function updateCharCount() {
+            const length = answerTextarea.value.length;
+            charCount.textContent = `${length}자`;
+        }
+
+        // 답변 저장 시 피드백 표시
+        function showSaveFeedback(length) {
+            charFeedback.style.display = 'block';
+            
+            if (length < 100) {
+                charFeedback.className = 'char-feedback feedback-low';
+                charFeedback.textContent = `아쉬워요... 조금 더 자세히 작성해보세요! 💪`;
+            } else if (length < 200) {
+                charFeedback.className = 'char-feedback feedback-medium';
+                charFeedback.textContent = `잘했어요! 좋은 답변이에요! 👍`;
+            } else {
+                charFeedback.className = 'char-feedback feedback-high';
+                charFeedback.textContent = `훌륭해요! 매우 상세한 답변입니다! 🌟`;
+            }
+
+            // 3초 후 피드백 자동 숨김
+            setTimeout(() => {
+                charFeedback.style.display = 'none';
+            }, 3000);
+        }
+
+        // 답변 저장
+        function saveAnswer() {
+            const answer = answerTextarea.value.trim();
+            const question = questionText.textContent;
+            const length = answer.length;
+            
+            if (!answer) {
+                showToast('❌ 답변을 작성해주세요!');
+                return;
+            }
+
+            // 피드백 표시
+            showSaveFeedback(length);
+
+            const historyItem = {
+                question: question,
+                answer: answer,
+                timestamp: new Date().toLocaleString('ko-KR'),
+                category: questionCategory.textContent,
+                charCount: length
+            };
+
+            answerHistory.unshift(historyItem);
+            
+            // 최대 20개까지만 저장
+            if (answerHistory.length > 20) {
+                answerHistory = answerHistory.slice(0, 20);
+            }
+
+            localStorage.setItem('answerHistory', JSON.stringify(answerHistory));
+            updateHistoryDisplay();
+            showToast('✅ 답변이 저장되었습니다!');
+        }
+
+        // 히스토리 표시 업데이트
+        function updateHistoryDisplay() {
+            if (answerHistory.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #999; font-size: 0.9em;">저장된 답변이 없습니다</p>';
+                clearHistoryBtn.style.display = 'none';
+                return;
+            }
+
+            clearHistoryBtn.style.display = 'block';
+            historyList.innerHTML = answerHistory.map((item, index) => `
+                <div class="history-item">
+                    <div class="history-question">${index + 1}. ${item.question}</div>
+                    <div class="history-answer">${item.answer.substring(0, 100)}${item.answer.length > 100 ? '...' : ''}</div>
+                    <div class="history-time">${item.category} | ${item.charCount}자 | ${item.timestamp}</div>
+                </div>
+            `).join('');
+        }
+
+        // 히스토리 삭제
+        function clearHistory() {
+            if (confirm('정말로 모든 답변 히스토리를 삭제하시겠습니까?')) {
+                answerHistory = [];
+                localStorage.removeItem('answerHistory');
+                updateHistoryDisplay();
+                showToast('🗑️ 히스토리가 삭제되었습니다.');
+            }
+        }
+
+        // 카테고리 필터
+        function filterByCategory(category) {
+            selectedCategory = category;
+            
+            // 버튼 활성화 상태 변경
+            categoryBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active');
+                }
+            });
+
+            shuffleQuestions();
+            showToast(`📂 ${category === 'all' ? '전체' : categoryNames[category]} 질문으로 변경되었습니다.`);
+        }
+
+        // 타이머 함수
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    timerDisplay.textContent = formatTime(timerSeconds);
+                }, 1000);
+                showToast('⏱️ 타이머 시작!');
+            }
+        }
+
+        function pauseTimer() {
+            if (isTimerRunning) {
+                isTimerRunning = false;
+                clearInterval(timerInterval);
+                showToast('⏸️ 타이머 일시정지');
+            }
+        }
+
+        function resetTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            timerDisplay.textContent = '00:00';
+            showToast('🔄 타이머 초기화');
+        }
+
+        // 토스트 알림
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // 이벤트 리스너
+        nextQuestionBtn.addEventListener('click', showNextQuestion);
+        copyQuestionBtn.addEventListener('click', copyQuestion);
+        answerTextarea.addEventListener('input', updateCharCount); // 글자 수만 업데이트
+        saveAnswerBtn.addEventListener('click', saveAnswer);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterByCategory(btn.dataset.category);
+            });
+        });
+
+        startTimerBtn.addEventListener('click', startTimer);
+        pauseTimerBtn.addEventListener('click', pauseTimer);
+        resetTimerBtn.addEventListener('click', resetTimer);
+
+        // 초기화 실행
+        init();
+
+        // 첫 질문 자동 표시
+        showNextQuestion();
+    </script>
+</body>
+</html>
