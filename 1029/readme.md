@@ -1,434 +1,309 @@
-# 📘 명품 웹 프로그래밍 8장 요약  
-**HTML DOM(Document Object Model)**
+# 📘 명품 웹 프로그래밍 8·9장 핵심 정리
+
+## ✅ 8장 — DOM(Document Object Model)
 
 ---
 
-## 🎯 학습 목표  
-- HTML DOM의 필요성과 구조 이해  
-- DOM 트리와 HTML 태그의 관계 파악  
-- DOM 객체의 구성 요소(프로퍼티, 메서드, 컬렉션 등) 이해  
-- DOM을 이용해 HTML 콘텐츠와 스타일 제어  
-- `document` 객체의 역할과 활용법 습득  
-- `createElement()`, `appendChild()` 등을 이용한 DOM 동적 조작  
+### 🎯 학습 포인트
+- DOM의 기본 개념 및 필요성 파악
+- DOM 트리 구조와 HTML 요소 간 관계 이해
+- DOM 객체 구성 요소 및 속성/메서드 활용
+- `document` 객체 중심 HTML·CSS 동적 제어 방법 숙지
+- `createElement()`, `appendChild()` 등을 활용한 동적 요소 생성
 
 ---
 
-## 🧱 HTML DOM의 개념  
-- **DOM(Document Object Model)**:  
-  브라우저가 HTML 문서를 해석해 **태그마다 객체를 생성**한 구조.  
-- **목적**  
-  - HTML 태그의 **출력 모양**과 **콘텐츠**를 제어  
-  - CSS 스타일 시트를 동적으로 변경  
-  - 텍스트, 이미지 등의 내용을 수정  
+## 🌐 DOM이란?
+브라우저가 HTML 문서를 분석하여 **각 태그를 객체 형태로 표현한 계층적 구조**입니다.  
+→ 이를 통해 스크립트로 HTML 요소의 **내용, 속성, 스타일** 등을 조작할 수 있습니다.
 
 ---
 
-## 🌳 DOM 트리 구조  
-- HTML 문서의 포함 관계에 따라 **트리(tree)** 형태로 구성됨  
-- 각 HTML 태그마다 **DOM 객체(Node)** 하나씩 생성  
-- **루트 객체**는 `document`  
-- DOM 변경 시 브라우저는 즉시 해당 HTML 출력 갱신  
+## 🌳 DOM 트리
+- HTML 문서는 트리 구조로 표현됨
+- 문서 전체의 루트는 `document`
+- 각 HTML 태그는 하나의 노드(Node)에 대응
 
----
-
-## 📄 예시 구조
 ```html
 <html>
-  <head><title>HTML DOM 트리</title></head>
+  <head><title>DOM 예시</title></head>
   <body>
-    <p>이것은 <span>문장입니다.</span></p>
+    <p>문장 <span>여기</span></p>
     <form>
       <input type="text">
-      <input type="button" value="테스트">
+      <input type="button" value="확인">
     </form>
   </body>
 </html>
 ```
-→ DOM 트리 관계
-`document` → `html` → (`head`, `body`) → (`p`, `form`) → (`span`, `input`, `input`)
+
+→ DOM 관계:  
+`document → html → head/body → p/form → span/input…`
 
 ---
 
-## 🧩 DOM 객체의 구성 요소
-| 구성 요소 | 설명 |
-|-----------|------|
-| property | 태그 속성(attribute)을 반영 |
-| method | DOM 조작용 함수 |
-| collection | 자식 노드들의 집합 (배열 형태) |
-| event listener | 이벤트 발생 시 실행되는 함수 |
-| CSS3 style | 태그의 스타일 정보를 제어 |
+## 🔧 DOM 객체의 구성
+| 구성 | 설명 |
+|------|------|
+| property | HTML 속성 반영 |
+| method | DOM 조작 기능 |
+| collection | 자식 요소 모음 |
+| event listener | 특정 이벤트에 반응하는 함수 |
+| style | CSS 제어 |
 
 ```js
-let p = document.getElementById("firstP");
-p.style.color = "red";       // 글자 색 변경
-p.innerHTML = "새 텍스트";  // 콘텐츠 변경
-
+const p = document.getElementById("firstP");
+p.style.color = "blue";
+p.innerHTML = "새 내용";
 ```
+
 ---
 
-## 🔍 DOM 탐색 관계
-| 관계 | 예시 속성 |
-|------|-----------|
-| 부모 노드 | `parentElement` |
+## 🔎 노드 탐색
+| 기능 | 예시 |
+|------|------|
+| 부모 | `parentElement` |
 | 첫 자식 | `firstElementChild` |
 | 마지막 자식 | `lastElementChild` |
-| 형제 노드 | `nextElementSibling`, `previousElementSibling` |
+| 인접 | `nextElementSibling`, `previousElementSibling` |
 | 자식 수 | `childElementCount` |
 
 ---
 
-## 🎨 CSS 스타일 동적 변경
-```html
-<span id="mySpan" style="color:red">문장입니다.</span>
-<script>
-let span = document.getElementById("mySpan");
-span.style.color = "green";
-span.style.fontSize = "30px";
-span.style.border = "3px dotted magenta";
-</script>
-```
-
----
-
-## 🧾 innerHTML 프로퍼티
-- 태그의 내부 콘텐츠를 읽거나 변경
+## 🎨 스타일 동적 변경
 ```js
-let p = document.getElementById("firstP");
-p.innerHTML = "나의 <img src='puppy.png'> 강아지";
+const span = document.getElementById("mySpan");
+span.style.color = "green";
+span.style.fontSize = "24px";
+span.style.border = "2px dashed purple";
 ```
--> 실행 시 `<p>` 내부 HTML이 교체됨
 
 ---
 
-## 🧠 this 키워드
-- 객체 자신을 가리킴
+## 🧾 innerHTML
+태그 내부의 HTML을 읽거나 변경
+
+```js
+const p = document.getElementById("firstP");
+p.innerHTML = "이미지 <img src='puppy.png'> 표시";
+```
+
+---
+
+## 🔹 this 키워드
+이벤트 발생 시 **해당 요소 자신**을 가리킴
+
 ```html
-<button onclick="this.style.color='red'">버튼</button>
-<div onclick="this.style.backgroundColor='orange'">DIV</div>
+<button onclick="this.style.color='red'">클릭</button>
 ```
 
 ---
 
-## 📘 document 객체
-- HTML 문서 전체를 대표하는 객체
-- DOM 트리의 **루트(root)** 역할
-- 접근 방법: `window.document` 또는 `document`
+## 📄 document 객체
+문서 전체를 대표하는 루트 객체
 
-| 주요 프로퍼티 | 설명 |
-|---------------|------|
-| `location` | 문서 URL |
-| `title` | 문서 제목 |
-| `head`, `body` | 주요 노드 접근 |
-| `domain` | 현재 도메인 |
-| `lastModified` | 마지막 수정 날짜 |
-| `readyState` | 문서 로드 상태 |
-| `activeElement` | 현재 포커스된 요소 |
+| 속성 | 의미 |
+|------|------|
+| location | 문서 URL |
+| title | 문서 제목 |
+| head/body | 주요 영역 |
+| domain | 도메인 |
+| lastModified | 최종 수정 |
+| readyState | 로딩 상태 |
+| activeElement | 현재 포커스 요소 |
 
 ---
 
-## 🔎 DOM 객체 찾기
+## ✅ 요소 검색
 | 메서드 | 설명 |
 |--------|------|
-| `getElementById(id)` | 특정 ID의 요소 찾기 |
-| `getElementsByTagName(name)` | 같은 태그 이름의 모든 요소 찾기 |
-| `getElementsByClassName(name)` | 같은 class 속성을 가진 모든 요소 찾기 |
+| getElementById | id로 찾기 |
+| getElementsByTagName | 태그명으로 찾기 |
+| getElementsByClassName | class로 찾기 |
 
-### 예시: getElementsByTagName()
 ```js
-let spanArray = document.getElementsByTagName("span");
-for(let i=0; i<spanArray.length; i++) {
-  spanArray[i].style.color = "orchid";
+const list = document.getElementsByClassName("food");
+for (let tag of list) {
+  tag.style.color = "teal";
 }
 ```
 
-### 예시: getElementsByClassName()
+---
+
+## 🧱 동적 요소 생성/삭제
+| 동작 | 메서드 |
+|------|--------|
+| 생성 | createElement |
+| 삽입 | appendChild |
+| 제거 | removeChild |
+
 ```js
-let foodList = document.getElementsByClassName("food");
-for(let tag of foodList) tag.style.color = "darkcyan";
+let box = document.createElement("div");
+box.innerHTML = "추가된 영역";
+box.style.background = "yellow";
+document.body.appendChild(box);
 ```
 
 ---
 
-## 🧾 document.write() / writeln()
-- 문서에 HTML 코드를 동적으로 출력
-
-```js
-document.write("<h3>Welcome!</h3>");
-document.write(2 + 3); // 숫자 계산 가능
-document.writeln("줄바꿈 포함 출력");
-```
-
-⚠️ 주의:
-`document.write()`는 문서가 완성된 후 실행하면 **기존 내용이 모두 삭제됨**
+## 📌 8장 핵심
+- HTML 요소는 모두 DOM 객체
+- `document`가 최상위
+- 내용·스타일은 `innerHTML`, `style`로 변경
+- 동적 생성 시 `createElement`, `appendChild` 사용
 
 ---
 
-## 📄 document.open() / close()
-- `open()` : 현재 문서 내용을 초기화하고 새로 작성 시작
-- `close()` : 문서 작성 완료
-
-```js
-document.open();
-document.write("<h1>Hello!</h1>");
-document.close();
-```
+# ✅ 9장 — 이벤트 & 리스너
 
 ---
 
-## 🧱 DOM 객체의 동적 생성
-| 기능 | 메서드 | 설명 |
-|------|--------|------|
-| DOM 생성 | `createElement("태그명")` | 새 HTML 요소 생성 |
-| DOM 삽입 | `appendChild(obj)` | 자식으로 추가 |
-| DOM 삭제 | `removeChild(obj)` |  특정 자식 제거 |
+## 🔎 이벤트란?
+- 사용자 입력·브라우저 상태 변화를 알려주는 **신호**
+- 해당 이벤트 발생 시 지정한 함수(리스너)가 실행
 
-```js
-let newDiv = document.createElement("div");
-newDiv.innerHTML = "새 DIV입니다.";
-newDiv.style.backgroundColor = "yellow";
-document.body.appendChild(newDiv);
-```
+이벤트 이름 앞에 `on` 붙임  
+예: `onclick`, `onload`, `onkeydown`
 
 ---
 
-## 🧠 핵심 정리
-- HTML의 각 태그는 **DOM 객체**로 표현되어 제어 가능
-- DOM 트리는 **document** 객체를 루트로 구성
-- `innerHTML`, `style`, `this` 등을 통해 동적 콘텐츠 제어 가능
-- `createElement()` / `appendChild()`로 **새 요소를 추가**하고, `removeChild()`로 **요소를 삭제** 가능
-
----
-
-# 📘 명품 웹 프로그래밍 9장 요약  
-**이벤트(Event)와 이벤트 리스너(Event Listener)**
-
----
-
-## 🎯 학습 목표
-- 이벤트의 개념과 발생 시점을 이해한다.  
-- 자바스크립트 코드로 이벤트 리스너를 작성할 수 있다.  
-- 이벤트의 흐름(capturing, bubbling)을 이해한다.  
-- `onload`를 이용한 문서 및 이미지 로딩 이벤트를 제어한다.  
-- 폼, 마우스, 키보드 관련 이벤트를 처리한다.
-
----
-
-## 🧠 이벤트(Event)의 개념
-- **이벤트**: 사용자의 입력(클릭, 키보드 입력 등)이나 문서/브라우저의 상태 변화를 알리는 신호  
-- **이벤트 리스너(Event Listener)**: 발생한 이벤트에 반응하여 실행되는 자바스크립트 코드  
-- **이벤트 이름 규칙**: 이벤트명 앞에 `on`을 붙임  
-  - 예: `onmousedown`, `onkeydown`, `onload`, `onclick`  
-
----
-
-## 🖱️ 주요 이벤트 종류
+## ⭐ 주요 이벤트
 | 이벤트 | 설명 |
 |--------|------|
-| `click` | 마우스 클릭 |
-| `dblclick` | 더블 클릭 |
-| `keydown` / `keyup` | 키 누름 / 뗌 |
-| `load` | 문서나 이미지 로딩 완료 |
-| `resize` | 창 크기 변경 |
-| `submit` / `reset` | 폼 제출 / 초기화 |
-| `change` | 입력값 변경 시 |
+| click / dblclick | 클릭 / 더블 클릭 |
+| keydown/keyup | 키 누름 / 뗌 |
+| load | 문서/이미지 로드 |
+| resize | 창 크기 변경 |
+| submit | 전송 |
+| change | 값 변경 |
 
 ---
 
-## 🧩 이벤트 리스너 작성 방법 (3가지)
-1. **HTML 태그 내 작성**
+## ✅ 리스너 작성 방식
+### 1) HTML 태그 내부
 ```html
-<p onmouseover="this.style.backgroundColor='orchid'" 
-onmouseout="this.style.backgroundColor='white'">
-마우스를 올리면 배경색이 변합니다.
+<p onmouseover="this.style.background='pink'">
+  마우스 올리면 색 변경
 </p>
 ```
 
-2. **DOM 객체의 리스너 프로퍼티 이용**
+### 2) DOM 프로퍼티 등록
 ```js
-let p = document.getElementById("p");
-p.onmouseover = function() { p.style.backgroundColor = "orchid"; };
-p.onmouseout = function() { p.style.backgroundColor = "white"; };
+p.onmouseover = () => p.style.background = "pink";
 ```
 
-3. **`addEventListener()` 메서드 이용**
+### 3) addEventListener
 ```js
-p.addEventListener("mouseover", over);
-p.addEventListener("mouseout", out);
-```
-
-✅ addEventListener()의 장점
-- 여러 리스너 등록 가능
-- 캡처/버블 단계 지정 가능
-
----
-
-## 🧠 익명 함수(Anonymous Function)
-```js
-p.addEventListener("mouseover", function() {
-  this.style.backgroundColor = "orchid";
+p.addEventListener("mouseover", () => {
+  p.style.background = "pink";
 });
 ```
-- 이름이 없는 함수로, 간단한 동작을 바로 정의할 때 사용
+
+→ 여러 이벤트 등록 가능, 버블링/캡처 지정 가능
 
 ---
 
-## ⚙️ 이벤트 객체(Event Object)
-- 발생한 이벤트 정보를 담은 객체
-- 리스너의 첫 번째 매개변수로 자동 전달
+## ⚙️ 이벤트 객체
+이벤트 정보가 담긴 객체
 
 ```js
-function f(e) {
-  alert(e.type); // 이벤트 종류 출력
+function info(e) {
+  alert(e.type);
 }
 ```
 
-| 주요 프로퍼티 | 설명 |
-|---------------|------|
-| `type` | 이벤트 종류 |
-| `target` | 이벤트가 발생한 DOM 객체 |
-| `currentTarget` | 현재 이벤트를 처리 중인 객체 |
-| `defaultPrevented` | 디폴트 행동 취소 여부 |
+| 속성 | 설명 |
+|------|------|
+| type | 이벤트 종류 |
+| target | 실제 이벤트 발생 요소 |
+| currentTarget | 현재 처리 중 요소 |
+| defaultPrevented | 기본 동작 취소 여부 |
 
 ---
 
-## 🚫 디폴트 행동 취소
-- 특정 이벤트의 기본 동작을 막을 수 있음
-
+## 🚫 기본 동작 막기
 ```html
-<a href="http://www.naver.com" onclick="return false">이동 안됨</a>
-<a href="http://www.naver.com" onclick="event.preventDefault()">이동 안됨</a>
-```
-
-또는
-
-```js
-function noAction(e) {
-  e.preventDefault(); // 디폴트 행동 취소
-}
+<a href="https://naver.com" onclick="event.preventDefault()">막힘</a>
 ```
 
 ---
 
-## 🔁 이벤트 흐름(Event Flow)
-- 이벤트는 `window -> target -> window` 순으로 흐름
-  - `Capturing Phase` : 상위 객체에서 타깃으로 전달
-  - `Bubbling Phase` : 타깃에서 다시 상위로 전달
+## 🔁 이벤트 흐름
+이벤트 전파 단계:  
+`캡처 → 타깃 → 버블`
 
 ```js
-element.addEventListener("click", handler, true);  // 캡처 리스너
-element.addEventListener("click", handler, false); // 버블 리스너
+tag.addEventListener("click", handler, true); // 캡처
+tag.addEventListener("click", handler, false); // 버블
 ```
 
-- **이벤트 중단** : `event.stopPropagation()` 사용
+전파 차단 → `event.stopPropagation()`
 
 ---
 
 ## 🖱️ 마우스 이벤트
 | 이벤트 | 설명 |
 |--------|------|
-| `onclick` | 클릭 시 |
-| `ondblclick` | 더블 클릭 시 |
-| `onmousedown` / `onmouseup` | 눌렀을 때 / 뗐을 때 |
-| `onmouseover` / `onmouseout` | 영역 진입 / 벗어남 |
-| `onwheel` | 마우스 휠 동작 시 |
-| `oncontextmenu` | 오른쪽 클릭 시 (컨텍스트 메뉴 차단 기능) |
+| onclick | 클릭 |
+| ondblclick | 더블 클릭 |
+| onover/out | 진입·탈출 |
+| onwheel | 휠 |
+| oncontextmenu | 우클릭 |
 
+우클릭 금지 예:
 ```js
-document.oncontextmenu = function() {
-  alert("오른쪽 클릭 금지");
-  return false;
-};
+document.oncontextmenu = () => false;
 ```
 
 ---
 
-## 📸 onload (문서/이미지 로딩 완료)
-1. **문서 로딩 완료 시 실행**
+## 📥 onload
+문서/이미지 로드 후 실행
+
 ```html
-<body onload="alert('페이지 로딩 완료!')">
+<body onload="alert('완료!')">
 ```
 
-2. **이미지 로딩 완료 시 실행**
+이미지 로드 확인
 ```js
-let img = document.getElementById("myImg");
-img.onload = function() {
-  alert("이미지 로드 완료: " + img.width + "x" + img.height);
-};
-img.src = "banana.png";
-```
-
-3. **new Image()를 이용한 사전 로딩**
-```js
-let preload = new Image();
-preload.src = "apple.png";
+img.onload = () => alert("로드 완료");
 ```
 
 ---
 
-## 🔡 포커스 관련 이벤트
-| 이벤트 | 설명 |
+## 🔡 포커스/폼 이벤트
+| 이벤트 | 의미 |
 |--------|------|
-| `onfocus` | 포커스를 얻을 때 |
-| `onblur` | 포커스를 잃을 때 |
-
-```js
-function checkFilled(obj) {
-  if (obj.value === "") obj.focus();
-}
-```
-
-## 🔘 폼(Form) 관련 이벤트
-| 이벤트 | 설명 |
-|--------|------|
-| `onchange` | 선택값 변경 시 |
-| `onsubmit` | 폼 전송 시 |
-| `onreset` | 폼 초기화 시 |
-
-**✅ 라디오 버튼 / 체크박스 예시**
-```js
-let items = document.getElementsByName("city");
-for (let i of items) if (i.checked) alert(i.value);
-```
-
-**✅ 체크박스 합계 계산**
-```js
-function calc(cBox) {
-  if(cBox.checked) sum += parseInt(cBox.value);
-  else sum -= parseInt(cBox.value);
-}
-```
+| focus | 포커스 획득 |
+| blur | 포커스 해제 |
+| submit | 전송 |
+| reset | 초기화 |
+| change | 변경 |
 
 ---
 
 ## ⌨️ 키보드 이벤트
-| 이벤트 | 설명 |
-|--------|------|
-| `onkeydown` | 키 눌림 |
-| `onkeypress` | 문자 입력 시 호출 |
-| `onkeyup` | 키 뗌 |
-
 ```js
-function whatKeyDown(e) {
-  console.log(e.key, e.code);
-}
-```
-
-**응용** : 방향키로 테이블 셀 이
-
-```js
-switch(e.key) {
-  case "ArrowUp": index -= 3; break;
-  case "ArrowDown": index += 3; break;
-  case "ArrowLeft": index--; break;
-  case "ArrowRight": index++; break;
-}
+document.onkeydown = (e) => console.log(e.key);
 ```
 
 ---
 
-## 🧭 핵심 정리
-- 이벤트는 사용자와 브라우저 간 상호작용의 중심 요소
-- 이벤트 리스너는 세 가지 방법으로 등록 가능
-- 이벤트 객체는 이벤트 정보(e.g., type, target)를 담고 있음
-- 디폴트 행동 취소와 이벤트 흐름 제어 가능
-- 다양한 입력 장치(마우스, 키보드, 폼) 이벤트 제어 가능
+## 📌 9장 핵심
+- 이벤트는 상호작용의 중심
+- 리스너 등록 방식 3개
+- 이벤트 객체로 상세 정보 확인
+- 기본 동작 취소·전파 제어 가능
+- 다양한 입력 이벤트 처리 가능
+
+---
+
+# ✅ 전체 요약
+- DOM은 HTML 문서를 객체 트리로 표현
+- `document`를 통해 모든 요소 제어
+- `innerHTML`, `style` 등으로 내용/스타일 변경
+- `createElement`, `appendChild`로 동적 구성
+- 이벤트는 사용자·환경 변화에 반응
+- addEventListener를 이용해 유연하게 제어
+
+---
