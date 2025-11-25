@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>스마트 올팍 파킹 시스템</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1a202c;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+        .dashboard { 
+            display: grid; 
+            grid-template-columns: 400px 1fr; 
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 1024px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
+        .sidebar { 
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .main-content { 
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            min-height: 600px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .venue-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            margin-bottom: 24px; 
+        }
+        .venue-card { 
+            padding: 16px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            text-align: center; 
+            background: #f7fafc;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .venue-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .venue-card.selected { 
+            border-color: #667eea; 
+            background: linear-gradient(135deg, #f0f4ff 0%, #fdf2f8 100%);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .venue-card small {
+            display: block;
+            margin-top: 4px;
+            color: #718096;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            border: 2px solid #e2e8f0;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-primary { 
+            width: 100%; 
+            padding: 14px 20px; 
+            border-radius: 12px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            font-weight: 700; 
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .results { display: none; }
+        .results.show { display: block; }
+        .time-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        .time-banner-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.95;
+        }
+        .time-banner-value {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .time-banner-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .time-step {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+        .time-step-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .time-step-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        .section-header {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+        .parking-grid { 
+            display: grid; 
+            gap: 16px; 
+        }
+        .parking-card { 
+            background: white;
+            border-radius: 16px; 
+            padding: 24px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .parking-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+        .parking-card.rank-1 {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.2);
+        }
+        .parking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .parking-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #2d3748;
+            flex: 1;
+        }
+        .parking-score {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            min-width: 80px;
+            text-align: right;
+        }
+        .parking-card.rank-1 .parking-score {
+            background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .parking-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .detail-label {
+            font-size: 13px;
+            color: #718096;
+            font-weight: 600;
+        }
+        .detail-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        .parking-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-navigate {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-navigate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+        .btn-map {
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: white;
+            color: #2d3748;
+            border: 2px solid #e2e8f0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-map:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        .qr-section {
+            margin-top: 30px;
+            padding: 24px;
+            background: #f7fafc;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+        .qr-section h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #2d3748;
+        }
+        #qrcode {
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .loading { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.5); 
+            align-items: center; 
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .loading.show { display: flex; }
+        .loading-content {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .spinner { 
+            width: 50px; 
+            height: 50px; 
+            border: 4px solid #e2e8f0; 
+            border-top-color: #667eea; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+        .empty-state p {
+            font-size: 16px;
+            color: #718096;
+            line-height: 1.6;
+        }
+        .note {
+            background: #fef3c7;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #92400e;
+            margin-top: 12px;
+            border-left: 4px solid #f59e0b;
+        }
+        footer {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        footer h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        footer pre {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            overflow-x: auto;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+        footer p {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .rank-badge {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            line-height: 32px;
+            text-align: center;
+            margin-right: 8px;
+        }
+        .parking-card:not(.rank-1) .rank-badge {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🚗 스마트 올팍 파킹 시스템</h1>
+        <p>실시간 공연정보 · 운영현황 · 서울시 공영주차장 API 통합 분석</p>
+    </div>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="form-group">
+                <div class="section-title">🎭 실시간 공연 검색</div>
+                <button class="btn-primary" id="refreshPerformancesBtn" onclick="loadPerformanceList()">
+                    공연 목록 불러오기
+                </button>
+                <select id="performanceSelect" class="form-control" style="margin-top: 12px;">
+                    <option value="">(공연을 선택하세요)</option>
+                </select>
+                <div class="note">
+                    서버 CORS 정책으로 인해 브라우저에서 직접 호출이 제한될 수 있습니다.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="section-title">📍 공연장 선택</div>
+                <div class="venue-grid" id="venueGrid">
+                    <div class="venue-card" data-venue="올림픽홀">
+                        올림픽홀
+                        <small>클래식/오페라</small>
+                    </div>
+                    <div class="venue-card" data-venue="체조경기장">
+                        체조경기장
+                        <small>체조/스포츠</small>
+                    </div>
+                    <div class="venue-card" data-venue="펜싱경기장">
+                        펜싱경기장
+                        <small>펜싱/경기</small>
+                    </div>
+                    <div class="venue-card" data-venue="KSPO DOME">
+                        KSPO DOME
+                        <small>콘서트</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="section-title">🚗 출발지</div>
+                <input id="startLocation" class="form-control" placeholder="예: 신림역, 역삼동, 강남역" value="강남역" />
+            </div>
+
+            <div class="form-group">
+                <div class="section-title">⏱️ 공연 시작 시간</div>
+                <input id="performanceTime" type="time" class="form-control" value="19:00" />
+            </div>
+
+            <div class="form-group">
+                <div class="section-title">⏱️ 여유 시간 (분)</div>
+                <input id="bufferTime" type="number" class="form-control" value="15" min="5" max="120" />
+            </div>
+
+            <button class="btn-primary" onclick="searchParking()">
+                🔍 최적 주차장 찾기
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <div id="emptyState" class="empty-state">
+                <h2>🎯 분석 준비 완료</h2>
+                <p>좌측에서 공연을 선택하고 출발지를 입력한 뒤<br>'최적 주차장 찾기'를 눌러주세요.</p>
+            </div>
+
+            <div id="results" class="results">
+                <div class="time-banner">
+                    <div class="time-banner-title">⏰ 권장 출발 시간</div>
+                    <div class="time-banner-value" id="departureTime">--:--</div>
+                    <div class="time-banner-info" id="selectedPerformanceInfo">(선택한 공연 정보)</div>
+                </div>
+
+                <div class="timeline">
+                    <div class="time-step">
+                        <div class="time-step-label">출발</div>
+                        <div class="time-step-value" id="timeStart">--:--</div>
+                    </div>
+                    <div class="time-step">
+                        <div class="time-step-label">주차장 도착</div>
+                        <div class="time-step-value" id="timeParking">--:--</div>
+                    </div>
+                    <div class="time-step">
+                        <div class="time-step-label">도보 시작</div>
+                        <div class="time-step-value" id="timeWalking">--:--</div>
+                    </div>
+                    <div class="time-step">
+                        <div class="time-step-label">공연장 도착</div>
+                        <div class="time-step-value" id="timeArrival">--:--</div>
+                    </div>
+                </div>
+
+                <section>
+                    <h3 class="section-header">🏆 추천 주차장 TOP 3</h3>
+                    <div id="parkingList" class="parking-grid"></div>
+                </section>
+
+                <section class="qr-section">
+                    <h4>📱 결과 공유 QR 코드</h4>
+                    <div id="qrcode"></div>
+                    <button class="btn-primary" onclick="downloadQR()" style="max-width: 300px; margin: 0 auto;">
+                        QR 코드 다운로드
+                    </button>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <h4>🔑 API Keys (Demo)</h4>
+        <pre>공연정보: 00ea82c4-18f7-4ed3-ac3c-9f4bc6a0bfb1
+운영현황: 009dfd9a-4867-4023-b154-06643c710224
+서울공영주차: 41464a594662696735335747727972</pre>
+        <p>CORS 문제로 정상 호출이 안 될 경우, 로컬 서버 또는 프록시 서버를 통해 호출하도록 구성하세요.</p>
+    </footer>
+</div>
+
+<div class="loading" id="loading">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <div class="loading-text">API 호출 중...</div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const PERFORMANCE_KEY = '00ea82c4-18f7-4ed3-ac3c-9f4bc6a0bfb1';
+const OPER_KEY = '009dfd9a-4867-4023-b154-06643c710224';
+const SEOUL_KEY = '41464a594662696735335747727972';
+const CORS_PROXY = '';
+
+const VENUE_COORDS = {
+    '올림픽홀': { lat: 37.5199, lng: 127.1220 },
+    '체조경기장': { lat: 37.5188, lng: 127.1238 },
+    '펜싱경기장': { lat: 37.5210, lng: 127.1205 },
+    'KSPO DOME': { lat: 37.5196, lng: 127.1219 }
+};
+
+let geocoder = null;
+let recommendedParkings = [];
+let performancesCache = [];
+
+window.addEventListener('load', () => {
+    document.querySelectorAll('.venue-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.venue-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+        });
+    });
+});
+
+async function fetchPerformanceInfo() {
+    try {
+        const url = `https://api.kcisa.kr/openapi/service/rest/meta/KSCperf?serviceKey=${PERFORMANCE_KEY}&numOfRows=50&pageNo=1`;
+        const full = CORS_PROXY + url;
+        const res = await fetch(full);
+        const txt = await res.text();
+        const xml = new DOMParser().parseFromString(txt, 'text/xml');
+        const items = Array.from(xml.getElementsByTagName('item') || []);
+        const out = items.map(it => ({
+            title: it.getElementsByTagName('title')[0]?.textContent ?? '',
+            venue: it.getElementsByTagName('spatial')[0]?.textContent ?? '',
+            date: it.getElementsByTagName('temporalCoverage')[0]?.textContent ?? '',
+            description: it.getElementsByTagName('description')[0]?.textContent ?? ''
+        }));
+        return out;
+    } catch (e) {
+        console.warn('fetchPerformanceInfo error', e);
+        return [];
+    }
+}
+
+async function fetchOperationStatus() {
+    try {
+        const url = `https://api.kcisa.kr/openapi/service/rest/meta12/getKSCD0801?serviceKey=${OPER_KEY}&numOfRows=50&pageNo=1`;
+        const full = CORS_PROXY + url;
+        const res = await fetch(full);
+        const txt = await res.text();
+        const xml = new DOMParser().parseFromString(txt, 'text/xml');
+        const items = Array.from(xml.getElementsByTagName('item') || []);
+        return items.map(it => ({
+            title: it.getElementsByTagName('title')[0]?.textContent ?? '',
+            spatial: it.getElementsByTagName('spatialCoverage')[0]?.textContent ?? '',
+            date: it.getElementsByTagName('temporal')[0]?.textContent ?? ''
+        }));
+    } catch (e) {
+        console.warn('fetchOperationStatus error', e);
+        return [];
+    }
+}
+
+async function fetchSeoulParkingAll() {
+    try {
+        const url = `http://openapi.seoul.go.kr:8088/${SEOUL_KEY}/xml/GetParkInfo/1/1000/`;
+        const full = CORS_PROXY + url;
+        const res = await fetch(full);
+        const txt = await res.text();
+        const xml = new DOMParser().parseFromString(txt, 'text/xml');
+        const rows = Array.from(xml.getElementsByTagName('row') || xml.getElementsByTagName('row'));
+        const parks = rows.map(r => ({
+            PKLT_NM: r.getElementsByTagName('PARKING_NAME')[0]?.textContent || r.getElementsByTagName('PKLT_NM')[0]?.textContent || '',
+            ADDR: r.getElementsByTagName('ADDR')[0]?.textContent ?? '',
+            TPKCT: Number((r.getElementsByTagName('TPKCT')[0]?.textContent) || (r.getElementsByTagName('TOT_PARKING_CNT')[0]?.textContent) || 0),
+            LAT: parseFloat(r.getElementsByTagName('LAT')[0]?.textContent || r.getElementsByTagName('Y_WGS84')[0]?.textContent || 0),
+            LNG: parseFloat(r.getElementsByTagName('LOT')[0]?.textContent || r.getElementsByTagName('X_WGS84')[0]?.textContent || 0),
+            PRK_CRG: r.getElementsByTagName('PRK_CRG')[0]?.textContent ?? ''
+        }));
+        return parks.filter(p => p.PKLT_NM && p.LAT && p.LNG);
+    } catch (e) {
+        console.warn('fetchSeoulParkingAll error', e);
+        return [];
+    }
+}
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+    const toR = v => v * Math.PI / 180;
+    const R = 6371;
+    const dLat = toR(lat2 - lat1);
+    const dLon = toR(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toR(lat1))*Math.cos(toR(lat2))*Math.sin(dLon/2)**2;
+    const c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+async function loadPerformanceList() {
+    document.getElementById('loading').classList.add('show');
+    const list = await fetchPerformanceInfo();
+    performancesCache = list;
+    const sel = document.getElementById('performanceSelect');
+    sel.innerHTML = '<option value="">(공연을 선택하세요)</option>';
+    list.forEach((p, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = p.title ? `${p.title} — ${p.venue || ''}` : `공연 ${idx+1}`;
+        sel.appendChild(opt);
+    });
+    document.getElementById('loading').classList.remove('show');
+}
+
+async function searchParking() {
+    const perfIndex = document.getElementById('performanceSelect').value;
+    const performanceTime = document.getElementById('performanceTime').value;
+    const startLocation = document.getElementById('startLocation').value || '';
+    const bufferTime = Number(document.getElementById('bufferTime').value || 15);
+
+    let venue = null;
+    if (perfIndex !== '') {
+        const p = performancesCache[Number(perfIndex)];
+        venue = p?.venue || p?.title || null;
+        document.getElementById('selectedPerformanceInfo').textContent = `${p?.title || '(공연)'} • ${p?.date || ''}`;
+    } else {
+        const sel = document.querySelector('.venue-card.selected');
+        venue = sel ? sel.dataset.venue : '올림픽홀';
+        document.getElementById('selectedPerformanceInfo').textContent = venue;
+    }
+
+    if (!performanceTime) { 
+        alert('공연 시작 시간을 입력하세요'); 
+        return; 
+    }
+
+    document.getElementById('loading').classList.add('show');
+
+    try {
+        const startCoords = await simpleGeocode(startLocation);
+        let parks = await fetchSeoulParkingAll();
+        
+        if (!parks.length) {
+            parks = [
+                { PKLT_NM:'올림픽공원 제1주차장', LAT:37.5219, LNG:127.1231, TPKCT:500, PRK_CRG:'10분당 600원' },
+                { PKLT_NM:'올림픽공원 제2주차장', LAT:37.5205, LNG:127.1250, TPKCT:300, PRK_CRG:'10분당 600원' },
+                { PKLT_NM:'방이동 공영주차장', LAT:37.5180, LNG:127.1195, TPKCT:200, PRK_CRG:'10분당 500원' }
+            ];
+        }
+
+        const venueKey = Object.keys(VENUE_COORDS).find(k => venue.includes(k)) || venue;
+        const venueCoords = VENUE_COORDS[venueKey] || VENUE_COORDS['올림픽홀'];
+
+        const enriched = parks.map(p => {
+            const lat = Number(p.LAT || p.lat || p.LATITUDE || 0);
+            const lng = Number(p.LNG || p.LOT || p.LNG || 0);
+            const distanceFromStart_km = haversineKm(startCoords.lat, startCoords.lng, lat, lng);
+            const driveMinutes = Math.max(Math.round((distanceFromStart_km / 30) * 60), 5);
+            const walk_km = haversineKm(lat, lng, venueCoords.lat, venueCoords.lng);
+            const walkMinutes = Math.max(Math.round((walk_km / 5) * 60), 1);
+            
+            // 개선된 점수 계산 (100점 만점)
+            // 기본 점수 100에서 감점 방식
+            let score = 100;
+            
+            // 거리 감점 (출발지에서 주차장까지) - 최대 30점 감점
+            const distancePenalty = Math.min(distanceFromStart_km * 3, 30);
+            score -= distancePenalty;
+            
+            // 도보 시간 감점 - 최대 30점 감점
+            const walkPenalty = Math.min(walkMinutes * 1.5, 30);
+            score -= walkPenalty;
+            
+            // 주차 공간 가산점 - 최대 20점 가산
+            const capacityBonus = Math.min((p.TPKCT || 0) / 25, 20);
+            score += capacityBonus;
+            
+            // 최종 점수는 0~100 사이로 제한
+            score = Math.max(0, Math.min(100, Math.round(score)));
+            
+            return {
+                ...p,
+                lat, lng, distanceFromStart_km, driveMinutes, walkMinutes, score
+            };
+        });
+
+        enriched.sort((a,b) => b.score - a.score);
+        recommendedParkings = enriched.slice(0,3);
+
+        const [hours,minutes] = performanceTime.split(':').map(Number);
+        const perfDate = new Date();
+        perfDate.setHours(hours, minutes, 0, 0);
+        if (perfDate <= new Date()) perfDate.setDate(perfDate.getDate()+1);
+
+        const top = recommendedParkings[0];
+        const totalMinutes = (top.driveMinutes || 10) + bufferTime + (top.walkMinutes || 5) + 5;
+        const departureDate = new Date(perfDate.getTime() - totalMinutes*60000);
+
+        const times = {
+            departure: departureDate,
+            parkingArrival: new Date(departureDate.getTime() + (top.driveMinutes||10)*60000),
+            walkStart: new Date(departureDate.getTime() + (top.driveMinutes||10 + 5)*60000),
+            venueArrival: perfDate
+        };
+
+        displayResults(times, recommendedParkings, venue);
+        generateQRCode();
+        
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('results').classList.add('show');
+    } catch (e) {
+        console.error(e);
+        alert('주차장 추천 중 오류 발생: 콘솔을 확인하세요');
+    } finally {
+        document.getElementById('loading').classList.remove('show');
+    }
+}
+
+async function simpleGeocode(text) {
+    const t = (text || '').toLowerCase();
+    const mapping = {
+        '강남역': { lat:37.4979, lng:127.0276 },
+        '신림역': { lat:37.4843, lng:126.9297 },
+        '역삼동': { lat:37.5004, lng:127.0374 },
+        '신림동': { lat:37.4843, lng:126.9297 },
+        '방이동': { lat:37.514, lng:127.123 },
+        '올림픽공원': { lat:37.5209, lng:127.1216 }
+    };
+    for (const k in mapping) if (t.includes(k.toLowerCase())) return mapping[k];
+    return { lat:37.5209, lng:127.1216 };
+}
+
+function displayResults(times, parkings, venue) {
+    const fmt = d => `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    document.getElementById('departureTime').textContent = fmt(times.departure);
+    document.getElementById('timeStart').textContent = fmt(times.departure);
+    document.getElementById('timeParking').textContent = fmt(times.parkingArrival);
+    document.getElementById('timeWalking').textContent = fmt(times.walkStart);
+    document.getElementById('timeArrival').textContent = fmt(times.venueArrival);
+
+    const list = document.getElementById('parkingList');
+    list.innerHTML = '';
+    parkings.forEach((p,i) => {
+        const html = `
+            <div class="parking-card ${i===0?'rank-1':''}">
+                <div class="parking-header">
+                    <div class="parking-name">
+                        <span class="rank-badge">${i+1}</span>${p.PKLT_NM}
+                    </div>
+                    <div class="parking-score">${p.score}점</div>
+                </div>
+                <div class="parking-details">
+                    <div class="detail-item">
+                        <div class="detail-label">출발지 거리</div>
+                        <div class="detail-value">${(p.distanceFromStart_km||0).toFixed(2)} km</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">차량 소요시간</div>
+                        <div class="detail-value">${p.driveMinutes ?? '-'} 분</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">도보 소요시간</div>
+                        <div class="detail-value">${p.walkMinutes ?? '-'} 분</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">주차 요금</div>
+                        <div class="detail-value">${p.PRK_CRG || '정보없음'}</div>
+                    </div>
+                </div>
+                <div class="parking-actions">
+                    <button class="btn-navigate" onclick="navigateToParking(${p.lat},${p.lng},'${escapeHtml(p.PKLT_NM)}')">
+                        🧭 길찾기
+                    </button>
+                    <button class="btn-map" onclick="centerMap(${p.lat},${p.lng})">
+                        🗺️ 지도
+                    </button>
+                </div>
+            </div>
+        `;
+        list.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+function generateQRCode() {
+    const qrDiv = document.getElementById('qrcode');
+    qrDiv.innerHTML = '';
+    if (!recommendedParkings.length) return;
+    const top = recommendedParkings[0];
+    const url = `https://map.kakao.com/link/to/${encodeURIComponent(top.PKLT_NM)},${top.lat},${top.lng}`;
+    new QRCode(qrDiv, { text: url, width:200, height:200 });
+}
+
+function downloadQR() {
+    const canvas = document.querySelector('#qrcode canvas');
+    if (!canvas) return alert('QR 코드가 없습니다.');
+    const link = document.createElement('a');
+    link.download = 'smart_parking_qr.png';
+    link.href = canvas.toDataURL();
+    link.click();
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function navigateToParking(lat,lng,name) {
+    window.open(`https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`, '_blank');
+}
+
+function centerMap(lat,lng) {
+    alert('지도 기능은 카카오맵 연동이 필요합니다. 현재는 데모 버전입니다.');
+}
+
+loadPerformanceList();
+</script>
+</body>
+</html>
