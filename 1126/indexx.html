@@ -5,7 +5,7 @@
     <title>PWA 테스트 앱</title>
 
     <!-- PWA manifest 연결 -->
-    <link rel="manifest" href="/webpro/manifest.json" />
+    <link rel="manifest" href="manifest.json" />
 
     <!-- 모바일에서 예쁘게 보이게 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -72,13 +72,14 @@
     <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
-          .register("/webpro/pwabuilder-sw.js")
+          .register("pwabuilder-sw.js")
           .then(() => console.log("✅ Service Worker registered"))
           .catch((err) => console.error("SW 등록 실패:", err));
       }
     </script>
   </body>
 </html>
+
 
 
 
