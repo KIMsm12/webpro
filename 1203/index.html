@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>포트폴리오 - 김수민</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4A6CF7;
+            --secondary: #6A89FF;
+            --text-dark: #2d2d2d;
+            --text-gray: #6e6e6e;
+            --bg-light: linear-gradient(145deg, #f7faff, #eef3ff);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", "Noto Sans KR", sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .wrapper {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 30px;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* 왼쪽 프로필 */
+        .sidebar {
+            flex: 0 0 330px;
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+        }
+
+        /* 카드 공통 */
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.10);
+        }
+
+        .profile {
+            text-align: center;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            margin-bottom: 15px;
+        }
+
+        .name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-gray);
+            margin-bottom: 20px;
+        }
+
+        /* 연락처 */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .contact-item a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .contact-item a:hover {
+            color: var(--primary);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.85;
+        }
+
+        /* 오른쪽 */
+        .main-content {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 55px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+            white-space: pre-line;
+        }
+
+        .features-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 20px;
+        }
+
+        .features-list li {
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        /* 타임라인 */
+        .timeline {
+            border-left: 3px solid #e3e6f0;
+            padding-left: 25px;
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            left: -33px;
+            top: 5px;
+        }
+
+        .timeline-school {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .timeline-status {
+            font-size: 0.9rem;
+            padding: 3px 8px;
+            background: #eef1ff;
+            border-radius: 6px;
+            margin-left: 10px;
+            color: #555;
+        }
+
+        /* 스킬바 */
+        .skill-item {
+            margin-bottom: 25px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .skill-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #eef0f8;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .skill-level {
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 1.4s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <!-- 왼쪽 프로필 -->
+        <div class="sidebar">
+            <div class="card profile">
+                <img class="profile-img" src="01.jpg" alt="프로필">
+
+                <h1 class="name">김수민</h1>
+                <p class="subtitle">꾸준히 성장하는 개발자 지망생</p>
+
+                <div class="contact-info">
+
+                    <!-- 이메일 -->
+                    <div class="contact-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2">
+                            <path d="M4 4h16v16H4z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                        <a href="mailto:bigdia13@gmail.com">bigdia13@gmail.com</a>
+                    </div>
+
+                    <!-- GitHub -->
+                    <div class="contact-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 
+                            3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
+                            0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
+                            -.546-1.387-1.333-1.757-1.333-1.757-1.089-.745.083-.729.083-.729 
+                            1.205.084 1.84 1.237 1.84 1.237 1.07 1.835 2.807 1.304 
+                            3.492.997.108-.776.418-1.305.762-1.604 
+                            -2.665-.304-5.466-1.334-5.466-5.93 
+                            0-1.31.468-2.38 1.236-3.22-.135-.303-.54-1.524.105-3.176 
+                            0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.552 
+                            3.285-1.23 3.285-1.23.645 1.652.24 2.873.12 3.176.765.84 
+                            1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.37.81 1.096.81 2.22 
+                            0 1.604-.015 2.896-.015 3.286 0 .315.21.69.825.57 
+                            C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                        </svg>
+                        <a href="https://github.com/Kimsm12" target="_blank">@Kimsm12</a>
+                    </div>
+
+                    <!-- 전화 -->
+                    <div class="contact-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 
+                            19.79 19.79 0 0 1-8.63-3.07 
+                            19.5 19.5 0 0 1-6-6 
+                            19.79 19.79 0 0 1-3.07-8.63 
+                            A2 2 0 0 1 4.08 2h3a2 2 0 0 1 2 1.73 
+                            c.22 1.05.54 2.15.98 3.21 
+                            .36.85.02 1.83-.98 2.22 
+                            A10 10 0 0 0 15 15c.39-.4.87-.72 
+                            1.4-.98.99-.4 1.77-.02 2.21.98 
+                            .44 1.06.77 2.16.98 3.21z"/>
+                        </svg>
+                        <span>010-3062-2469</span>
+                    </div>
+
+                    <!-- 생년월일 -->
+                    <div class="contact-item">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>2002.09.22</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 메인 -->
+        <div class="main-content">
+
+            <!-- 소개 -->
+            <div class="card">
+                <h2 class="section-title">자기소개</h2>
+                <p class="intro-text">
+안녕하세요, 김수민입니다.
+
+C, Java, Python 기반으로 프로그래밍 기초를 탄탄히 다지고 있으며 
+알고리즘과 웹 개발 분야에 가장 큰 흥미를 가지고 있습니다.
+
+"사용자에게 실제 가치를 주는 서비스"를 만드는 개발자가 되는 것을 목표로 
+꾸준히 성장하고 있습니다.
+                </p>
+
+                <h3 style="margin-top:20px; font-size:1.25rem; color:var(--primary);">장단점</h3>
+                <ul class="features-list">
+                    <li><b>장점:</b> 새로운 기술을 빠르게 습득하며 문제 해결 과정에서 끈기가 강합니다.</li>
+                    <li><b>단점:</b> 디테일에 집중하다 일정 조율이 어려울 때가 있어, 현재는 일정 관리 도구로 개선 중입니다.</li>
+                </ul>
+            </div>
+
+            <!-- 학력 -->
+            <div class="card">
+                <h2 class="section-title">학력</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <span class="timeline-school">경성대학교</span>
+                        <span class="timeline-status">재학 중</span>
+                    </div>
+
+                    <div class="timeline-item">
+                        <span class="timeline-school">대진전자통신고등학교</span>
+                        <span class="timeline-status">졸업</span>
+                    </div>
+
+                    <div class="timeline-item">
+                        <span class="timeline-school">금정중학교</span>
+                        <span class="timeline-status">졸업</span>
+                    </div>
+
+                    <div class="timeline-item">
+                        <span class="timeline-school">청룡초등학교</span>
+                        <span class="timeline-status">졸업</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 스킬 -->
+            <div class="card">
+                <h2 class="section-title">기술 스택</h2>
+
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span>C Language</span>
+                        <span>70%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-level" data-width="70%"></div>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span>Java</span>
+                        <span>50%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-level" data-width="50%"></div>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span>Python</span>
+                        <span>40%</span>
+                    </div>
+                    <div class="skill-bar-bg">
+                        <div class="skill-level" data-width="40%"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 스킬바 애니메이션
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".skill-level").forEach(bar => {
+                const width = bar.dataset.width;
+                setTimeout(() => { bar.style.width = width; }, 300);
+            });
+        });
+    </script>
+
+</body>
+</html>
