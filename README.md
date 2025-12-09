@@ -3,17 +3,17 @@
 
 [1주차 내용 요약](https://kimsm12.github.io/webpro/0903/readme.md)
 
-2주차 내용 요약
+[2주차 내용 요약](https://kimsm12.github.io/webpro/0910/readme.md)
 
-3주차 내용 요약
+[3주차 내용 요약](https://kimsm12.github.io/webpro/0917/readme.md)
 
-4주차 내용 요약
+[4주차 내용 요약](https://kimsm12.github.io/webpro/0924/readme.md)
 
-5주차 내용 요약
+[5주차 내용 요약](https://kimsm12.github.io/webpro/1001/readme.md)
 
-6주차 내용 요약
+[6주차 내용 요약](https://kimsm12.github.io/webpro/1015/readme.md)
 
-7주차 내용 요약
+[7주차 내용 요약](https://kimsm12.github.io/webpro/1029/readme.md)
 
 
 ## 1. 웹 프로그래밍 개요
