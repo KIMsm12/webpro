@@ -1,7 +1,7 @@
 # 📌 웹프로그래밍 요약
 
 
-[1주차 내용 요약]([https://example.com](https://kimsm12.github.io/webpro/0903/readme.md))
+[1주차 내용 요약](https://kimsm12.github.io/webpro/0903/readme.md)
 
 2주차 내용 요약
 
